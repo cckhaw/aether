@@ -1,0 +1,38 @@
+name: Clean up Vercel deployments
+
+# After a production deploy succeeds, delete all other deployments (old production builds and previews).
+on:
+  deployment_status:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Only list what would be deleted
+        type: boolean
+        default: true
+
+permissions: {}
+
+concurrency:
+  group: cleanup-vercel
+  cancel-in-progress: false
+
+env:
+  VERCEL_PROJECT_ID: prj_za8oWdypGx6riiCaCSOwQbRfOlH9
+  VERCEL_TEAM_ID: team_FdOJU6k0aSSHE2P7hHTWrNuP
+
+jobs:
+  cleanup:
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.deployment_status.state == 'success' &&
+       github.event.deployment.environment == 'Production')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/scripts
+      - name: Delete old deployments
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || 'false' }}
+        run: .github/scripts/cleanup-vercel.sh
