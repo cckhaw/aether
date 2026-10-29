@@ -34,6 +34,9 @@ export default function App() {
 
   const account = useAccount({ guestHandle: guest.handle, country: region.code });
   const signedIn = account.status === 'in' && !!account.profile;
+  useEffect(() => {
+    if (account.error) setShowAuth(true);
+  }, [account.error]);
   const identity = signedIn ? { id: account.profile.id, handle: account.profile.handle } : guest;
 
   // Procedural spawn: on first fix, then whenever the player moves > 50 m from the last spawn origin.
