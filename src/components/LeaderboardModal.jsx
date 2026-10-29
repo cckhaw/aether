@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Check, Copy, Pencil, Send, X } from 'lucide-react';
+import { Check, ChevronDown, Copy, Pencil, Send, X } from 'lucide-react';
 import { fetchLeaderboard, submitScoreLive, submitScoreLocal } from '../lib/leaderboard.js';
 import { sanitizeHandle } from '../lib/identity.js';
 import { buildShareText, copyText } from '../lib/share.js';
-import { flag } from '../lib/region.js';
+import { COUNTRIES, flag } from '../lib/region.js';
 
 const TABS = [
   { id: 'global', label: 'Global' },
@@ -20,7 +20,7 @@ const medal = (rank) => ({ 1: '🥇', 2: '🥈', 3: '🥉' }[rank] || rank);
 const fmt = (row, metric) =>
   metric === 'distance_m' ? `${(row.distance_m / 1000).toFixed(2)} km` : row[metric];
 
-export default function LeaderboardModal({ identity, region, run, seed, account, onRename, onSignIn, onClose }) {
+export default function LeaderboardModal({ identity, region, run, seed, account, onRename, onCountry, onSignIn, onClose }) {
   const [tab, setTab] = useState('global');
   const [metric, setMetric] = useState('score');
   const [rows, setRows] = useState([]);
@@ -136,7 +136,30 @@ export default function LeaderboardModal({ identity, region, run, seed, account,
               <div>
                 <div className="text-[16px] font-semibold">{identity.handle}</div>
                 <div className="text-[12px] text-white/50">
-                  {flag(region.code)} {region.name} · {run.score} pts · {run.sparks} sparks
+                  <label className="relative inline-flex items-center gap-1 text-aether-blue">
+                    {flag(region.code)} {region.name} <ChevronDown size={12} />
+                    {/* Native picker laid over the label: best UX on phones. */}
+                    <select
+                      aria-label="Country"
+                      value={region.code}
+                      onChange={async (e) => {
+                        const err = await onCountry(e.target.value);
+                        setNotice(err || '');
+                        load();
+                      }}
+                      className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                    >
+                      {!COUNTRIES.some((c) => c.code === region.code) && (
+                        <option value={region.code}>{region.name}</option>
+                      )}
+                      {COUNTRIES.map((c) => (
+                        <option key={c.code} value={c.code}>
+                          {flag(c.code)} {c.name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>{' '}
+                  · {run.score} pts · {run.sparks} sparks
                 </div>
               </div>
               <button
