@@ -1,8 +1,3 @@
 {
-  "rewrites": [
-    {
-      "source": "/neon-auth/:path*",
-      "destination": "https://ep-shy-tree-a1sy9f5m.neonauth.ap-southeast-1.aws.neon.tech/neondb/auth/:path*"
-    }
-  ]
+  "rewrites": [{ "source": "/neon-auth/:path*", "destination": "/api/neon-auth/:path*" }]
 }
