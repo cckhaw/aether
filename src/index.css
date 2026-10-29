@@ -1,0 +1,108 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  background: #0b1020;
+  color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.leaflet-container {
+  background: #0b1020;
+  font-family: inherit;
+}
+.leaflet-control-attribution {
+  background: rgba(15, 23, 42, 0.6) !important;
+  color: rgba(255, 255, 255, 0.5) !important;
+  font-size: 9px;
+  backdrop-filter: blur(8px);
+  margin-bottom: calc(110px + var(--safe-bottom)) !important;
+}
+.leaflet-control-attribution a {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* Player pulse marker */
+.player-marker {
+  position: relative;
+  width: 22px;
+  height: 22px;
+}
+.player-marker .core {
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background: #007aff;
+  border: 2.5px solid #fff;
+  box-shadow: 0 0 18px rgba(0, 122, 255, 0.9), 0 0 36px rgba(0, 245, 212, 0.5);
+}
+.player-marker .ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid #00f5d4;
+  animation: pulseRing 2s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+}
+.player-marker .ring.delay {
+  animation-delay: 1s;
+}
+
+/* Spark marker */
+.spark-marker {
+  position: relative;
+  width: 28px;
+  height: 28px;
+}
+.spark-marker .gem {
+  position: absolute;
+  inset: 6px;
+  background: radial-gradient(circle at 35% 30%, #fff, #ffd700 55%, #ff9f0a);
+  transform: rotate(45deg);
+  border-radius: 4px;
+  box-shadow: 0 0 14px rgba(255, 215, 0, 0.9), 0 0 30px rgba(255, 215, 0, 0.45);
+  animation: floaty 2.4s ease-in-out infinite;
+}
+.spark-marker.in-range .gem {
+  background: radial-gradient(circle at 35% 30%, #fff, #00f5d4 55%, #007aff);
+  box-shadow: 0 0 18px rgba(0, 245, 212, 1), 0 0 40px rgba(0, 245, 212, 0.6);
+}
+
+@keyframes pulseRing {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+@keyframes floaty {
+  0%,
+  100% {
+    transform: rotate(45deg) translate(0, 0);
+  }
+  50% {
+    transform: rotate(45deg) translate(-3px, -3px);
+  }
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
