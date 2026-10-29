@@ -57,7 +57,8 @@ export default function AuthSheet({ account, onClose }) {
         otp: code.trim(),
       });
       if (err) throw new Error(err.message || 'That code didn’t work');
-      await account.refresh();
+      const res = await account.refresh();
+      if (!res.ok) throw new Error(res.reason);
       onClose();
     });
 
@@ -176,7 +177,9 @@ export default function AuthSheet({ account, onClose }) {
                 </button>
               </>
             )}
-            {error && <p className="text-center text-[13px] text-red-400">{error}</p>}
+            {(error || account.error) && (
+              <p className="text-center text-[13px] text-red-400">{error || account.error}</p>
+            )}
           </div>
         )}
       </div>
