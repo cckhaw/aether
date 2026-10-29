@@ -10,7 +10,7 @@ import { useGeolocation } from './hooks/useGeolocation.js';
 import { HARVEST_RADIUS_M, RESPAWN_DISTANCE_M, haversine, spawnSparks } from './lib/geo.js';
 import { playChime, playPing, unlockAudio, vibrate } from './lib/audio.js';
 import { loadIdentity, saveIdentity } from './lib/identity.js';
-import { detectRegion } from './lib/region.js';
+import { countryName, detectRegion, loadCountryOverride, saveCountryOverride } from './lib/region.js';
 import { getSeed } from './lib/share.js';
 
 const MAX_SPARKS_ON_MAP = 12;
@@ -30,10 +30,18 @@ export default function App() {
   const lastPosRef = useRef(null);
   const alertedRef = useRef(null);
 
-  const region = useMemo(() => detectRegion(pos), [pos?.lat > 0, pos?.lng > 0]); // eslint-disable-line react-hooks/exhaustive-deps
+  const detected = useMemo(() => detectRegion(pos), [pos?.lat > 0, pos?.lng > 0]); // eslint-disable-line react-hooks/exhaustive-deps
+  const [countryOverride, setCountryOverride] = useState(loadCountryOverride);
 
-  const account = useAccount({ guestHandle: guest.handle, country: region.code });
+  const account = useAccount({ guestHandle: guest.handle, country: countryOverride || detected.code });
   const signedIn = account.status === 'in' && !!account.profile;
+  // Player's choice wins, then the country saved on their account, then the guess from locale/GPS.
+  const savedCountry = signedIn && account.profile.country !== 'XX' ? account.profile.country : null;
+  const regionCode = countryOverride || savedCountry || detected.code;
+  const region = useMemo(
+    () => ({ code: regionCode, name: countryName(regionCode) }),
+    [regionCode]
+  );
   useEffect(() => {
     if (account.error) setShowAuth(true);
   }, [account.error]);
@@ -100,6 +108,13 @@ export default function App() {
     return null;
   };
 
+  // Returns an error message or null.
+  const changeCountry = async (code) => {
+    setCountryOverride(code);
+    saveCountryOverride(code);
+    return signedIn ? account.setCountry(code) : null;
+  };
+
   const openBoard = () => {
     unlockAudio();
     setShowBoard(true);
@@ -149,6 +164,7 @@ export default function App() {
           seed={seed}
           account={account}
           onRename={rename}
+          onCountry={changeCountry}
           onSignIn={() => setShowAuth(true)}
           onClose={() => setShowBoard(false)}
         />

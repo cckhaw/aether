@@ -81,7 +81,7 @@ export function useAccount({ guestHandle, country }) {
       const { profile: p } = await api('/api/me', {
         method: 'POST',
         auth: true,
-        body: { handle, country: hint.current.country },
+        body: { handle },
       });
       setProfile(p);
       return null;
@@ -90,5 +90,16 @@ export function useAccount({ guestHandle, country }) {
     }
   }, []);
 
-  return { enabled: authEnabled, status, user, profile, error, refresh, signOut, rename };
+  /** Returns an error message, or null on success. */
+  const setCountry = useCallback(async (country) => {
+    try {
+      const { profile: p } = await api('/api/me', { method: 'POST', auth: true, body: { country } });
+      setProfile(p);
+      return null;
+    } catch (e) {
+      return e.message;
+    }
+  }, []);
+
+  return { enabled: authEnabled, status, user, profile, error, refresh, signOut, rename, setCountry };
 }

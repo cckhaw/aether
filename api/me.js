@@ -25,8 +25,9 @@ export default route(['GET', 'POST'], async (req) => {
   if (req.method === 'GET') return { profile: await getProfile(sql, user.id) };
 
   const body = req.body || {};
-  const country = parseCountry(body.country);
   const existing = await getProfile(sql, user.id);
+  // Only change country when the client actually sent one (a rename must not reset it).
+  const country = body.country ? parseCountry(body.country) : existing?.country ?? 'XX';
 
   if (!existing) {
     // First sign-in: honour the handle the player already had as a guest if it's free.
@@ -59,6 +60,10 @@ export default route(['GET', 'POST'], async (req) => {
     }
   } else if (country !== existing.country) {
     await sql`UPDATE players SET country = ${country} WHERE user_id = ${user.id}`;
+  }
+  if (country !== existing.country) {
+    // Country leaderboards read scores.country, so move the player's existing scores too.
+    await sql`UPDATE scores SET country = ${country} WHERE user_id = ${user.id}`;
   }
   return { profile: await getProfile(sql, user.id) };
 });
