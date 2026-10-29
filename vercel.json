@@ -1,3 +1,3 @@
 {
-  "rewrites": [{ "source": "/neon-auth/:path*", "destination": "/api/neon-auth/:path*" }]
+  "rewrites": [{ "source": "/neon-auth/:path*", "destination": "/api/neon-auth?path=:path*" }]
 }
