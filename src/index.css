@@ -7,13 +7,42 @@
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
+/* Night is the default; day overrides below. fg/cyan/gold are "R G B" so Tailwind alpha works. */
+:root,
+:root[data-theme='night'] {
+  color-scheme: dark;
+  --fg: 255 255 255;
+  --cyan: 0 245 212;
+  --gold: 255 215 0;
+  --page-bg: #0b1020;
+  --glass-bg: rgba(15, 23, 42, 0.75);
+  --glass-strong: rgba(15, 23, 42, 0.9);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --attrib-bg: rgba(15, 23, 42, 0.6);
+  --attrib-fg: rgba(255, 255, 255, 0.5);
+}
+:root[data-theme='day'] {
+  color-scheme: light;
+  --fg: 15 23 42;
+  --cyan: 0 150 136;
+  --gold: 176 125 0;
+  --page-bg: #eef2f7;
+  --glass-bg: rgba(255, 255, 255, 0.74);
+  --glass-strong: rgba(255, 255, 255, 0.93);
+  --glass-border: rgba(15, 23, 42, 0.1);
+  --glass-shadow: 0 8px 28px rgba(15, 23, 42, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  --attrib-bg: rgba(255, 255, 255, 0.7);
+  --attrib-fg: rgba(15, 23, 42, 0.6);
+}
+
 html,
 body,
 #root {
   height: 100%;
   margin: 0;
-  background: #0b1020;
-  color: #fff;
+  background: var(--page-bg);
+  color: rgb(var(--fg));
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif;
   -webkit-font-smoothing: antialiased;
   overscroll-behavior: none;
@@ -21,18 +50,18 @@ body,
 }
 
 .leaflet-container {
-  background: #0b1020;
+  background: var(--page-bg);
   font-family: inherit;
 }
 .leaflet-control-attribution {
-  background: rgba(15, 23, 42, 0.6) !important;
-  color: rgba(255, 255, 255, 0.5) !important;
+  background: var(--attrib-bg) !important;
+  color: var(--attrib-fg) !important;
   font-size: 9px;
   backdrop-filter: blur(8px);
   margin-bottom: calc(110px + var(--safe-bottom)) !important;
 }
 .leaflet-control-attribution a {
-  color: rgba(255, 255, 255, 0.7) !important;
+  color: rgb(var(--fg) / 0.75) !important;
 }
 
 /* Player pulse marker */
@@ -53,7 +82,7 @@ body,
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  border: 2px solid #00f5d4;
+  border: 2px solid rgb(var(--cyan));
   animation: pulseRing 2s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
 }
 .player-marker .ring.delay {

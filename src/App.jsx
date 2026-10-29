@@ -6,6 +6,7 @@ import DemoControls from './components/DemoControls.jsx';
 import LeaderboardModal from './components/LeaderboardModal.jsx';
 import AuthSheet from './components/AuthSheet.jsx';
 import { useAccount } from './hooks/useAccount.js';
+import { useTheme } from './hooks/useTheme.js';
 import { useGeolocation } from './hooks/useGeolocation.js';
 import { HARVEST_RADIUS_M, RESPAWN_DISTANCE_M, haversine, spawnSparks } from './lib/geo.js';
 import { playChime, playPing, unlockAudio, vibrate } from './lib/audio.js';
@@ -17,6 +18,7 @@ const MAX_SPARKS_ON_MAP = 12;
 
 export default function App() {
   const { pos, accuracy, status, enterDemo, exitDemo, nudge, retry } = useGeolocation();
+  const { theme, toggle: toggleTheme } = useTheme();
   const [guest, setGuest] = useState(loadIdentity);
   const [seed] = useState(getSeed);
   const [sparks, setSparks] = useState([]);
@@ -123,6 +125,7 @@ export default function App() {
   return (
     <div className="relative h-full w-full overflow-hidden" onPointerDown={unlockAudio}>
       <GameMap
+        theme={theme}
         pos={pos}
         sparks={sparks}
         inRangeId={inRangeId}
@@ -130,6 +133,8 @@ export default function App() {
         onUserPan={() => setFollow(false)}
       />
       <HUD
+        theme={theme}
+        onToggleTheme={toggleTheme}
         handle={identity.handle}
         signedIn={signedIn}
         onAccount={() => setShowAuth(true)}

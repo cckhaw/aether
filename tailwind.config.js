@@ -13,17 +13,19 @@ export default {
         ],
       },
       colors: {
+        // Theme-aware: values come from CSS variables set per [data-theme] in index.css.
+        fg: 'rgb(var(--fg) / <alpha-value>)',
+        on: '#FFFFFF', // text/borders that sit on accent fills; white in both themes
         aether: {
-          cyan: '#00F5D4',
+          cyan: 'rgb(var(--cyan) / <alpha-value>)',
           blue: '#007AFF',
-          gold: '#FFD700',
+          gold: 'rgb(var(--gold) / <alpha-value>)',
           ink: '#0B1020',
         },
         glass: {
-          DEFAULT: 'rgba(15, 23, 42, 0.75)',
-          strong: 'rgba(15, 23, 42, 0.88)',
-          border: 'rgba(255, 255, 255, 0.12)',
-          hover: 'rgba(255, 255, 255, 0.08)',
+          DEFAULT: 'var(--glass-bg)',
+          strong: 'var(--glass-strong)',
+          border: 'var(--glass-border)',
         },
       },
       borderRadius: {
@@ -62,12 +64,12 @@ export default {
     function ({ addComponents }) {
       addComponents({
         '.glass': {
-          background: 'rgba(15, 23, 42, 0.75)',
+          background: 'var(--glass-bg)',
           backdropFilter: 'blur(24px) saturate(160%)',
           WebkitBackdropFilter: 'blur(24px) saturate(160%)',
-          border: '1px solid rgba(255, 255, 255, 0.12)',
+          border: '1px solid var(--glass-border)',
           borderRadius: '24px',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.08)',
+          boxShadow: 'var(--glass-shadow)',
         },
       });
     },
