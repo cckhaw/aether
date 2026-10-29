@@ -1,4 +1,5 @@
 // Same-origin proxy to Neon Auth, so the session cookie is first-party to this site.
+// Reached via the /neon-auth/* rewrite in vercel.json, which passes the sub-path as ?path=.
 // (A plain vercel.json rewrite forwards our Host header, which Neon rejects with INVALID_HOSTNAME.)
 const HOP_BY_HOP = new Set([
   'connection',
@@ -42,8 +43,9 @@ export default async function handler(req, res) {
   if (!base) return fail(res, 503, 'Auth is not configured (NEON_AUTH_BASE_URL missing)');
 
   const { path, ...query } = req.query || {};
-  const segments = [].concat(path || []);
-  if (segments.some((s) => s === '.' || s === '..' || s.includes('/'))) {
+  // The rewrite delivers e.g. ".well-known/jwks.json" as one string (possibly an array of them).
+  const segments = [].concat(path || []).flatMap((p) => String(p).split('/')).filter(Boolean);
+  if (segments.some((s) => s === '.' || s === '..')) {
     return fail(res, 400, 'Bad path');
   }
   const url = new URL(`${base.replace(/\/$/, '')}/${segments.map(encodeURIComponent).join('/')}`);
