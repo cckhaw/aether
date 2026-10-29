@@ -4,8 +4,9 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { HARVEST_RADIUS_M } from '../lib/geo.js';
 
-const TILES = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
-const ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a>';
+// Keyless OSM raster tiles, darkened via CSS (.dark-tiles). Swap for a keyed provider before heavy/commercial use.
+const TILES = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+const ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
 const playerIcon = L.divIcon({
   className: '',
@@ -60,7 +61,13 @@ export default function GameMap({ pos, sparks, inRangeId, follow, onUserPan }) {
       className="absolute inset-0 z-0"
       attributionControl
     >
-      <TileLayer url={TILES} attribution={ATTRIBUTION} subdomains="abcd" maxZoom={20} />
+      <TileLayer
+        url={TILES}
+        attribution={ATTRIBUTION}
+        maxZoom={19}
+        maxNativeZoom={19}
+        className="dark-tiles"
+      />
       {pos && (
         <>
           <Circle
