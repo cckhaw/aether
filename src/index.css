@@ -106,3 +106,8 @@ body,
 .no-scrollbar {
   scrollbar-width: none;
 }
+
+/* Midnight cartography: invert OSM's light tiles into a deep-blue dark map */
+.dark-tiles {
+  filter: invert(1) hue-rotate(200deg) saturate(0.55) brightness(0.9) contrast(0.95);
+}
