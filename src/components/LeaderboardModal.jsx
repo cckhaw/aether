@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Check, Copy, Pencil, Send, X } from 'lucide-react';
-import { fetchLeaderboard, submitScore } from '../lib/leaderboard.js';
+import { fetchLeaderboard, submitScoreLive, submitScoreLocal } from '../lib/leaderboard.js';
 import { sanitizeHandle } from '../lib/identity.js';
 import { buildShareText, copyText } from '../lib/share.js';
 import { flag } from '../lib/region.js';
@@ -20,10 +20,12 @@ const medal = (rank) => ({ 1: '🥇', 2: '🥈', 3: '🥉' }[rank] || rank);
 const fmt = (row, metric) =>
   metric === 'distance_m' ? `${(row.distance_m / 1000).toFixed(2)} km` : row[metric];
 
-export default function LeaderboardModal({ identity, region, run, seed, onRename, onClose }) {
+export default function LeaderboardModal({ identity, region, run, seed, account, onRename, onSignIn, onClose }) {
   const [tab, setTab] = useState('global');
   const [metric, setMetric] = useState('score');
   const [rows, setRows] = useState([]);
+  const [source, setSource] = useState('demo');
+  const [notice, setNotice] = useState('');
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -32,7 +34,9 @@ export default function LeaderboardModal({ identity, region, run, seed, onRename
 
   const load = useCallback(async () => {
     setLoading(true);
-    setRows(await fetchLeaderboard({ scope: tab, country: region.code, metric }));
+    const res = await fetchLeaderboard({ scope: tab, country: region.code, metric });
+    setRows(res.rows);
+    setSource(res.source);
     setLoading(false);
   }, [tab, metric, region.code]);
 
@@ -41,15 +45,28 @@ export default function LeaderboardModal({ identity, region, run, seed, onRename
   }, [load]);
 
   const submit = async () => {
+    // Real accounts: scores only count when signed in.
+    if (account.enabled && account.status !== 'in') {
+      onSignIn();
+      return;
+    }
     setSubmitting(true);
-    await submitScore({
-      id: identity.id,
-      handle: identity.handle,
-      country: region.code,
-      score: run.score,
-      sparks: run.sparks,
-      distance_m: Math.round(run.distanceM),
-    });
+    setNotice('');
+    try {
+      if (account.enabled) await submitScoreLive(run, region.code);
+      else
+        await submitScoreLocal({
+          id: identity.id,
+          handle: identity.handle,
+          country: region.code,
+          score: run.score,
+          sparks: run.sparks,
+          distance_m: Math.round(run.distanceM),
+        });
+      setNotice('Score submitted!');
+    } catch (e) {
+      setNotice(e.message || 'Could not submit score');
+    }
     setSubmitting(false);
     load();
   };
@@ -69,9 +86,12 @@ export default function LeaderboardModal({ identity, region, run, seed, onRename
     }
   };
 
-  const saveName = () => {
+  const saveName = async () => {
     const h = sanitizeHandle(draft);
-    if (h) onRename(h);
+    if (!h) return setEditing(false);
+    const err = await onRename(h);
+    if (err) return setNotice(err);
+    setNotice('');
     setEditing(false);
   };
 
@@ -190,15 +210,25 @@ export default function LeaderboardModal({ identity, region, run, seed, onRename
           )}
         </div>
 
+        {(notice || source === 'demo') && (
+          <p className="mt-2 px-5 text-center text-[12px] text-white/45">
+            {notice || 'Offline demo board — sign-in and live rankings aren’t configured here.'}
+          </p>
+        )}
+
         {/* Actions */}
         <div className="mt-3 flex gap-3 px-5">
           <button
             onClick={submit}
-            disabled={submitting || run.sparks === 0}
+            disabled={submitting || (run.sparks === 0 && (!account.enabled || account.status === 'in'))}
             className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-aether-blue py-3.5 text-[15px] font-semibold transition active:scale-95 disabled:opacity-40"
           >
             <Send size={16} />
-            {submitting ? 'Submitting…' : 'Submit score'}
+            {submitting
+              ? 'Submitting…'
+              : account.enabled && account.status !== 'in'
+                ? 'Sign in to submit'
+                : 'Submit score'}
           </button>
           <button
             onClick={share}

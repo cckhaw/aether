@@ -4,6 +4,8 @@ import HUD from './components/HUD.jsx';
 import Dock from './components/Dock.jsx';
 import DemoControls from './components/DemoControls.jsx';
 import LeaderboardModal from './components/LeaderboardModal.jsx';
+import AuthSheet from './components/AuthSheet.jsx';
+import { useAccount } from './hooks/useAccount.js';
 import { useGeolocation } from './hooks/useGeolocation.js';
 import { HARVEST_RADIUS_M, RESPAWN_DISTANCE_M, haversine, spawnSparks } from './lib/geo.js';
 import { playChime, playPing, unlockAudio, vibrate } from './lib/audio.js';
@@ -15,12 +17,13 @@ const MAX_SPARKS_ON_MAP = 12;
 
 export default function App() {
   const { pos, accuracy, status, enterDemo, exitDemo, nudge, retry } = useGeolocation();
-  const [identity, setIdentity] = useState(loadIdentity);
+  const [guest, setGuest] = useState(loadIdentity);
   const [seed] = useState(getSeed);
   const [sparks, setSparks] = useState([]);
   const [run, setRun] = useState({ score: 0, sparks: 0, distanceM: 0 });
   const [follow, setFollow] = useState(true);
   const [showBoard, setShowBoard] = useState(false);
+  const [showAuth, setShowAuth] = useState(false);
 
   const originRef = useRef(null);
   const waveRef = useRef(0);
@@ -28,6 +31,10 @@ export default function App() {
   const alertedRef = useRef(null);
 
   const region = useMemo(() => detectRegion(pos), [pos?.lat > 0, pos?.lng > 0]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const account = useAccount({ guestHandle: guest.handle, country: region.code });
+  const signedIn = account.status === 'in' && !!account.profile;
+  const identity = signedIn ? { id: account.profile.id, handle: account.profile.handle } : guest;
 
   // Procedural spawn: on first fix, then whenever the player moves > 50 m from the last spawn origin.
   useEffect(() => {
@@ -81,10 +88,13 @@ export default function App() {
     vibrate(spark.value > 10 ? [30, 30, 30, 30, 90] : 80);
   }, [inRange, nearest]);
 
-  const rename = (handle) => {
-    const next = { ...identity, handle };
-    setIdentity(next);
+  // Returns an error message (e.g. handle taken) or null.
+  const rename = async (handle) => {
+    if (signedIn) return account.rename(handle);
+    const next = { ...guest, handle };
+    setGuest(next);
     saveIdentity(next);
+    return null;
   };
 
   const openBoard = () => {
@@ -103,6 +113,8 @@ export default function App() {
       />
       <HUD
         handle={identity.handle}
+        signedIn={signedIn}
+        onAccount={() => setShowAuth(true)}
         score={run.score}
         sparkCount={run.sparks}
         status={status}
@@ -132,10 +144,13 @@ export default function App() {
           region={region}
           run={run}
           seed={seed}
+          account={account}
           onRename={rename}
+          onSignIn={() => setShowAuth(true)}
           onClose={() => setShowBoard(false)}
         />
       )}
+      {showAuth && <AuthSheet account={account} onClose={() => setShowAuth(false)} />}
     </div>
   );
 }

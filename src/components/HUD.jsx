@@ -1,4 +1,4 @@
-import { Gem, Locate, Navigation, Satellite } from 'lucide-react';
+import { Gem, Locate, Navigation, Satellite, UserRound } from 'lucide-react';
 
 const STATUS = {
   locating: { label: 'Acquiring GPS…', tone: 'text-aether-gold' },
@@ -8,7 +8,7 @@ const STATUS = {
   unsupported: { label: 'No GPS support', tone: 'text-red-400' },
 };
 
-export default function HUD({ handle, score, sparkCount, status, accuracy, follow, onRecenter }) {
+export default function HUD({ handle, signedIn, onAccount, score, sparkCount, status, accuracy, follow, onRecenter }) {
   const s = STATUS[status] || STATUS.locating;
   return (
     <div
@@ -17,7 +17,14 @@ export default function HUD({ handle, score, sparkCount, status, accuracy, follo
     >
       <div className="glass pointer-events-auto flex items-center justify-between px-5 py-3">
         <div className="min-w-0">
-          <div className="truncate text-[13px] font-medium text-white/60">{handle}</div>
+          <button
+            onClick={onAccount}
+            className="flex max-w-full items-center gap-1.5 text-[13px] font-medium text-white/60 active:opacity-60"
+          >
+            <UserRound size={13} className={signedIn ? 'text-aether-cyan' : ''} />
+            <span className="truncate">{handle}</span>
+            {!signedIn && <span className="text-aether-blue">· Sign in</span>}
+          </button>
           <div className="flex items-baseline gap-1.5">
             <span className="text-[34px] font-semibold leading-none tracking-tight tabular-nums">
               {score}

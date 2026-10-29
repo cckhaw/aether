@@ -1,12 +1,14 @@
 import { hashString, mulberry32 } from './geo.js';
+import { api } from './api.js';
+import { authEnabled } from './auth.js';
 
 /**
- * Mock Supabase-backed leaderboard.
+ * Leaderboard adapter.
  *
- * The adapter exposes the same async surface a Supabase table would
- * (`submitScore`, `fetchLeaderboard`), so swapping in
- * `supabase.from('scores')` later only touches this file.
- * Rows: { id, handle, country, score, sparks, distance_m, created_at }
+ * With Neon Auth configured it talks to the real API (/api/leaderboard, /api/scores,
+ * backed by Neon Postgres). Without it (or if the API is unreachable, e.g. `vite dev`)
+ * it falls back to a localStorage mock plus seeded rivals so the UI still works.
+ * Rows: { id, handle, country, score, sparks, distance_m, created_at, rank }
  */
 const STORE_KEY = 'aether.scores.v1';
 const SEED_COUNTRIES = ['SG', 'US', 'GB', 'JP', 'DE', 'AU', 'FR', 'CA', 'MY', 'BR', 'IN', 'KR'];
@@ -41,8 +43,8 @@ function readLocal() {
 
 const delay = (ms = 250) => new Promise((r) => setTimeout(r, ms));
 
-/** Upsert the player's best run (one row per anonymous id). */
-export async function submitScore(row) {
+/** Guest/demo submit: upsert the player's best run (one row per anonymous id). */
+export async function submitScoreLocal(row) {
   await delay();
   const rows = readLocal();
   const i = rows.findIndex((r) => r.id === row.id);
@@ -60,8 +62,30 @@ export async function submitScore(row) {
   return rows.find((r) => r.id === row.id);
 }
 
-/** scope: 'global' | 'country' | 'local'. Returns ranked rows. */
+/** Signed-in submit: the server keeps each player's personal bests. */
+export async function submitScoreLive(run, country) {
+  return api('/api/scores', {
+    method: 'POST',
+    auth: true,
+    body: { score: run.score, sparks: run.sparks, distance_m: Math.round(run.distanceM), country },
+  });
+}
+
+/** scope: 'global' | 'country' | 'local'. Returns { rows, source: 'live' | 'demo' }. */
 export async function fetchLeaderboard({ scope, country, metric = 'score' }) {
+  if (authEnabled) {
+    try {
+      const qs = new URLSearchParams({ scope, country, metric });
+      const { rows } = await api(`/api/leaderboard?${qs}`);
+      return { rows, source: 'live' };
+    } catch {
+      /* fall through to the local mock */
+    }
+  }
+  return { rows: await fetchMock({ scope, country, metric }), source: 'demo' };
+}
+
+async function fetchMock({ scope, country, metric }) {
   await delay(150);
   const mine = readLocal();
   const ids = new Set(mine.map((r) => r.id));
