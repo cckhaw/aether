@@ -1,4 +1,4 @@
-import { Gem, Locate, Navigation, Satellite, UserRound } from 'lucide-react';
+import { Gem, Locate, Moon, Navigation, Satellite, Sun, UserRound } from 'lucide-react';
 
 const STATUS = {
   locating: { label: 'Acquiring GPS…', tone: 'text-aether-gold' },
@@ -8,7 +8,7 @@ const STATUS = {
   unsupported: { label: 'No GPS support', tone: 'text-red-400' },
 };
 
-export default function HUD({ handle, signedIn, onAccount, score, sparkCount, status, accuracy, follow, onRecenter }) {
+export default function HUD({ theme, onToggleTheme, handle, signedIn, onAccount, score, sparkCount, status, accuracy, follow, onRecenter }) {
   const s = STATUS[status] || STATUS.locating;
   return (
     <div
@@ -19,7 +19,7 @@ export default function HUD({ handle, signedIn, onAccount, score, sparkCount, st
         <div className="min-w-0">
           <button
             onClick={onAccount}
-            className="flex max-w-full items-center gap-1.5 text-[13px] font-medium text-white/60 active:opacity-60"
+            className="flex max-w-full items-center gap-1.5 text-[13px] font-medium text-fg/60 active:opacity-60"
           >
             <UserRound size={13} className={signedIn ? 'text-aether-cyan' : ''} />
             <span className="truncate">{handle}</span>
@@ -29,10 +29,10 @@ export default function HUD({ handle, signedIn, onAccount, score, sparkCount, st
             <span className="text-[34px] font-semibold leading-none tracking-tight tabular-nums">
               {score}
             </span>
-            <span className="text-[13px] font-medium text-white/50">pts</span>
+            <span className="text-[13px] font-medium text-fg/50">pts</span>
           </div>
         </div>
-        <div className="flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-[15px] font-semibold text-aether-gold">
+        <div className="flex items-center gap-1.5 rounded-full bg-fg/10 px-3 py-1.5 text-[15px] font-semibold text-aether-gold">
           <Gem size={16} strokeWidth={2.5} />
           <span className="tabular-nums">{sparkCount}</span>
         </div>
@@ -43,20 +43,33 @@ export default function HUD({ handle, signedIn, onAccount, score, sparkCount, st
           <Satellite size={14} className={s.tone} />
           <span className={s.tone}>{s.label}</span>
           {accuracy != null && status === 'tracking' && (
-            <span className="text-white/45">±{Math.round(accuracy)}m</span>
+            <span className="text-fg/45">±{Math.round(accuracy)}m</span>
           )}
         </div>
-        <button
-          onClick={onRecenter}
-          aria-label="Recenter map"
-          className="glass pointer-events-auto grid h-11 w-11 place-items-center !rounded-full transition active:scale-90"
-        >
-          {follow ? (
-            <Navigation size={18} className="text-aether-blue" fill="currentColor" />
-          ) : (
-            <Locate size={18} className="text-white/80" />
-          )}
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={onToggleTheme}
+            aria-label={theme === 'day' ? 'Switch to night view' : 'Switch to day view'}
+            className="glass pointer-events-auto grid h-11 w-11 place-items-center !rounded-full transition active:scale-90"
+          >
+            {theme === 'day' ? (
+              <Moon size={18} className="text-aether-blue" />
+            ) : (
+              <Sun size={18} className="text-aether-gold" />
+            )}
+          </button>
+          <button
+            onClick={onRecenter}
+            aria-label="Recenter map"
+            className="glass pointer-events-auto grid h-11 w-11 place-items-center !rounded-full transition active:scale-90"
+          >
+            {follow ? (
+              <Navigation size={18} className="text-aether-blue" fill="currentColor" />
+            ) : (
+              <Locate size={18} className="text-fg/80" />
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );

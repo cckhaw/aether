@@ -63,7 +63,7 @@ export default function AuthSheet({ account, onClose }) {
     });
 
   const input =
-    'w-full rounded-2xl bg-white/10 px-4 py-3.5 text-[16px] outline-none placeholder:text-white/35 focus:ring-2 focus:ring-aether-blue';
+    'w-full rounded-2xl bg-fg/10 px-4 py-3.5 text-[16px] outline-none placeholder:text-fg/35 focus:ring-2 focus:ring-aether-blue';
 
   return (
     <div className="absolute inset-0 z-[1100] flex items-end bg-black/50" onClick={onClose}>
@@ -72,7 +72,7 @@ export default function AuthSheet({ account, onClose }) {
         style={{ paddingBottom: 'calc(var(--safe-bottom) + 20px)' }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="mx-auto h-1 w-9 rounded-full bg-white/25" />
+        <div className="mx-auto h-1 w-9 rounded-full bg-fg/25" />
         <div className="mt-3 flex items-center justify-between">
           <h2 className="text-[22px] font-bold tracking-tight">
             {account.status === 'in' ? 'Account' : 'Sign in'}
@@ -80,23 +80,23 @@ export default function AuthSheet({ account, onClose }) {
           <button
             onClick={onClose}
             aria-label="Close"
-            className="grid h-8 w-8 place-items-center rounded-full bg-white/15 active:scale-90"
+            className="grid h-8 w-8 place-items-center rounded-full bg-fg/15 active:scale-90"
           >
             <X size={16} />
           </button>
         </div>
 
         {!account.enabled ? (
-          <p className="py-8 text-center text-[14px] text-white/60">
+          <p className="py-8 text-center text-[14px] text-fg/60">
             Accounts aren’t set up on this deployment yet. You’re playing as a guest.
           </p>
         ) : account.status === 'in' ? (
           <div className="mt-4 space-y-3">
-            <div className="rounded-2xl bg-white/[0.07] px-4 py-3">
+            <div className="rounded-2xl bg-fg/[0.07] px-4 py-3">
               <div className="text-[16px] font-semibold">{account.profile?.handle}</div>
-              <div className="text-[13px] text-white/50">{account.user?.email}</div>
+              <div className="text-[13px] text-fg/50">{account.user?.email}</div>
             </div>
-            <p className="text-[13px] text-white/50">
+            <p className="text-[13px] text-fg/50">
               Your scores follow you to any device you sign in on. Change your handle from the
               Ranks screen.
             </p>
@@ -105,7 +105,7 @@ export default function AuthSheet({ account, onClose }) {
                 await account.signOut();
                 onClose();
               }}
-              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-white/15 py-3.5 text-[15px] font-semibold active:scale-95"
+              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-fg/15 py-3.5 text-[15px] font-semibold active:scale-95"
             >
               <LogOut size={16} /> Sign out
             </button>
@@ -119,8 +119,8 @@ export default function AuthSheet({ account, onClose }) {
             >
               <GoogleMark /> Continue with Google
             </button>
-            <div className="flex items-center gap-3 text-[12px] text-white/35">
-              <span className="h-px flex-1 bg-white/15" /> or <span className="h-px flex-1 bg-white/15" />
+            <div className="flex items-center gap-3 text-[12px] text-fg/35">
+              <span className="h-px flex-1 bg-fg/15" /> or <span className="h-px flex-1 bg-fg/15" />
             </div>
 
             {step === 'email' ? (
@@ -138,15 +138,15 @@ export default function AuthSheet({ account, onClose }) {
                 <button
                   onClick={sendCode}
                   disabled={busy || !email.includes('@')}
-                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-aether-blue py-3.5 text-[15px] font-semibold active:scale-95 disabled:opacity-40"
+                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-aether-blue py-3.5 text-on text-[15px] font-semibold active:scale-95 disabled:opacity-40"
                 >
                   <Mail size={16} /> {busy ? 'Sending…' : 'Email me a code'}
                 </button>
               </>
             ) : (
               <>
-                <p className="text-[13px] text-white/60">
-                  We sent a code to <span className="text-white">{email}</span>.
+                <p className="text-[13px] text-fg/60">
+                  We sent a code to <span className="text-fg">{email}</span>.
                 </p>
                 <input
                   autoFocus
@@ -161,7 +161,7 @@ export default function AuthSheet({ account, onClose }) {
                 <button
                   onClick={verify}
                   disabled={busy || code.length < 4}
-                  className="w-full rounded-2xl bg-aether-blue py-3.5 text-[15px] font-semibold active:scale-95 disabled:opacity-40"
+                  className="w-full rounded-2xl bg-aether-blue py-3.5 text-on text-[15px] font-semibold active:scale-95 disabled:opacity-40"
                 >
                   {busy ? 'Verifying…' : 'Verify & sign in'}
                 </button>
@@ -171,7 +171,7 @@ export default function AuthSheet({ account, onClose }) {
                     setCode('');
                     setError('');
                   }}
-                  className="w-full text-[13px] text-white/50"
+                  className="w-full text-[13px] text-fg/50"
                 >
                   Use a different email
                 </button>

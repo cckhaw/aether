@@ -4,7 +4,8 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { HARVEST_RADIUS_M } from '../lib/geo.js';
 
-// Keyless OSM raster tiles, darkened via CSS (.dark-tiles). Swap for a keyed provider before heavy/commercial use.
+// Keyless OSM raster tiles: used as-is by day, darkened via CSS (.dark-tiles) at night.
+// Swap for a keyed provider before heavy/commercial use.
 const TILES = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 const ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
@@ -52,7 +53,8 @@ function Follower({ pos, follow, onUserPan }) {
   return null;
 }
 
-export default function GameMap({ pos, sparks, inRangeId, follow, onUserPan }) {
+export default function GameMap({ theme, pos, sparks, inRangeId, follow, onUserPan }) {
+  const accent = theme === 'day' ? '#00897B' : '#00F5D4';
   return (
     <MapContainer
       center={[pos?.lat ?? 1.2868, pos?.lng ?? 103.8545]}
@@ -61,12 +63,14 @@ export default function GameMap({ pos, sparks, inRangeId, follow, onUserPan }) {
       className="absolute inset-0 z-0"
       attributionControl
     >
+      {/* key remounts the layer: Leaflet can't change a tile layer's className in place */}
       <TileLayer
+        key={theme}
         url={TILES}
         attribution={ATTRIBUTION}
         maxZoom={19}
         maxNativeZoom={19}
-        className="dark-tiles"
+        className={theme === 'day' ? '' : 'dark-tiles'}
       />
       {pos && (
         <>
@@ -74,10 +78,10 @@ export default function GameMap({ pos, sparks, inRangeId, follow, onUserPan }) {
             center={[pos.lat, pos.lng]}
             radius={HARVEST_RADIUS_M}
             pathOptions={{
-              color: '#00F5D4',
+              color: accent,
               weight: 1,
               opacity: 0.6,
-              fillColor: '#00F5D4',
+              fillColor: accent,
               fillOpacity: 0.08,
               dashArray: '4 6',
             }}

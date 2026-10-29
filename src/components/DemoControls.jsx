@@ -6,7 +6,7 @@ const STEP_M = 10;
 export default function DemoControls({ status, demo, onEnter, onExit, onNudge, onRetry }) {
   if (demo) {
     const btn =
-      'glass grid h-12 w-12 place-items-center !rounded-2xl transition active:scale-90 active:bg-white/20';
+      'glass grid h-12 w-12 place-items-center !rounded-2xl transition active:scale-90 active:bg-fg/20';
     return (
       <div className="absolute bottom-[140px] left-4 z-[500] grid grid-cols-3 gap-1.5">
         <span />
@@ -41,7 +41,7 @@ export default function DemoControls({ status, demo, onEnter, onExit, onNudge, o
         <div className="text-[15px] font-semibold">
           {blocked ? 'Location access needed' : 'Finding your position…'}
         </div>
-        <p className="mt-1 text-[13px] text-white/60">
+        <p className="mt-1 text-[13px] text-fg/60">
           {blocked
             ? 'Enable location for this site in your browser settings, then retry.'
             : 'Step outside for the best signal, or try the demo.'}
@@ -50,14 +50,14 @@ export default function DemoControls({ status, demo, onEnter, onExit, onNudge, o
           {blocked && (
             <button
               onClick={onRetry}
-              className="rounded-full bg-aether-blue px-4 py-2 text-[14px] font-semibold active:scale-95"
+              className="rounded-full bg-aether-blue px-4 py-2 text-on text-[14px] font-semibold active:scale-95"
             >
               Retry
             </button>
           )}
           <button
             onClick={onEnter}
-            className="flex items-center gap-1.5 rounded-full bg-white/15 px-4 py-2 text-[14px] font-semibold active:scale-95"
+            className="flex items-center gap-1.5 rounded-full bg-fg/15 px-4 py-2 text-[14px] font-semibold active:scale-95"
           >
             <FlaskConical size={14} /> Demo mode
           </button>

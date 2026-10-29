@@ -102,23 +102,23 @@ export default function LeaderboardModal({ identity, region, run, seed, account,
         style={{ paddingBottom: 'calc(var(--safe-bottom) + 16px)' }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="mx-auto mt-2 h-1 w-9 rounded-full bg-white/25" />
+        <div className="mx-auto mt-2 h-1 w-9 rounded-full bg-fg/25" />
         <div className="flex items-center justify-between px-5 pt-3">
           <h2 className="text-[22px] font-bold tracking-tight">Leaderboard</h2>
           <button
             onClick={onClose}
             aria-label="Close"
-            className="grid h-8 w-8 place-items-center rounded-full bg-white/15 transition active:scale-90"
+            className="grid h-8 w-8 place-items-center rounded-full bg-fg/15 transition active:scale-90"
           >
             <X size={16} />
           </button>
         </div>
 
         {/* Identity */}
-        <div className="mx-5 mt-3 flex items-center justify-between rounded-2xl bg-white/[0.07] px-4 py-3">
+        <div className="mx-5 mt-3 flex shrink-0 items-center justify-between rounded-2xl bg-fg/[0.07] px-4 py-3">
           {editing ? (
             <div className="flex w-full items-center gap-2">
-              <span className="text-white/50">@</span>
+              <span className="text-fg/50">@</span>
               <input
                 autoFocus
                 value={draft}
@@ -135,7 +135,7 @@ export default function LeaderboardModal({ identity, region, run, seed, account,
             <>
               <div>
                 <div className="text-[16px] font-semibold">{identity.handle}</div>
-                <div className="text-[12px] text-white/50">
+                <div className="text-[12px] text-fg/50">
                   <label className="relative inline-flex items-center gap-1 text-aether-blue">
                     {flag(region.code)} {region.name} <ChevronDown size={12} />
                     {/* Native picker laid over the label: best UX on phones. */}
@@ -165,7 +165,7 @@ export default function LeaderboardModal({ identity, region, run, seed, account,
               <button
                 onClick={() => setEditing(true)}
                 aria-label="Edit handle"
-                className="grid h-8 w-8 place-items-center rounded-full bg-white/10 active:scale-90"
+                className="grid h-8 w-8 place-items-center rounded-full bg-fg/10 active:scale-90"
               >
                 <Pencil size={14} />
               </button>
@@ -174,26 +174,26 @@ export default function LeaderboardModal({ identity, region, run, seed, account,
         </div>
 
         {/* Segmented controls */}
-        <div className="mx-5 mt-3 flex rounded-xl bg-white/10 p-0.5">
+        <div className="mx-5 mt-3 flex shrink-0 rounded-xl bg-fg/10 p-0.5">
           {TABS.map((t) => (
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
               className={`flex-1 rounded-[10px] py-1.5 text-[13px] font-semibold transition ${
-                tab === t.id ? 'bg-white/25 text-white shadow' : 'text-white/60'
+                tab === t.id ? 'bg-fg/25 text-fg shadow' : 'text-fg/60'
               }`}
             >
               {t.label}
             </button>
           ))}
         </div>
-        <div className="no-scrollbar mx-5 mt-2 flex gap-2 overflow-x-auto">
+        <div className="no-scrollbar mx-5 mt-2 flex shrink-0 gap-2 overflow-x-auto">
           {METRICS.map((m) => (
             <button
               key={m.id}
               onClick={() => setMetric(m.id)}
               className={`rounded-full px-3 py-1 text-[12px] font-semibold transition ${
-                metric === m.id ? 'bg-aether-blue text-white' : 'bg-white/10 text-white/60'
+                metric === m.id ? 'bg-aether-blue text-on' : 'bg-fg/10 text-fg/60'
               }`}
             >
               {m.label}
@@ -204,13 +204,13 @@ export default function LeaderboardModal({ identity, region, run, seed, account,
         {/* Rows */}
         <div className="no-scrollbar mt-3 min-h-[160px] flex-1 overflow-y-auto px-5">
           {loading ? (
-            <div className="py-10 text-center text-[14px] text-white/40">Loading…</div>
+            <div className="py-10 text-center text-[14px] text-fg/40">Loading…</div>
           ) : rows.length === 0 ? (
-            <div className="py-10 text-center text-[14px] text-white/40">
+            <div className="py-10 text-center text-[14px] text-fg/40">
               No runs here yet. Submit yours to claim #1.
             </div>
           ) : (
-            <ul className="divide-y divide-white/10">
+            <ul className="divide-y divide-fg/10">
               {rows.map((r) => {
                 const me = r.id === identity.id;
                 return (
@@ -218,7 +218,7 @@ export default function LeaderboardModal({ identity, region, run, seed, account,
                     key={r.id}
                     className={`flex items-center gap-3 py-2.5 ${me ? 'text-aether-cyan' : ''}`}
                   >
-                    <span className="w-8 text-center text-[15px] font-semibold tabular-nums text-white/70">
+                    <span className="w-8 text-center text-[15px] font-semibold tabular-nums text-fg/70">
                       {medal(r.rank)}
                     </span>
                     <span className="text-[18px]">{flag(r.country)}</span>
@@ -234,17 +234,17 @@ export default function LeaderboardModal({ identity, region, run, seed, account,
         </div>
 
         {(notice || source === 'demo') && (
-          <p className="mt-2 px-5 text-center text-[12px] text-white/45">
+          <p className="mt-2 px-5 text-center text-[12px] text-fg/45">
             {notice || 'Offline demo board — sign-in and live rankings aren’t configured here.'}
           </p>
         )}
 
         {/* Actions */}
-        <div className="mt-3 flex gap-3 px-5">
+        <div className="mt-3 flex shrink-0 gap-3 px-5">
           <button
             onClick={submit}
             disabled={submitting || (run.sparks === 0 && (!account.enabled || account.status === 'in'))}
-            className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-aether-blue py-3.5 text-[15px] font-semibold transition active:scale-95 disabled:opacity-40"
+            className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-aether-blue py-3.5 text-on text-[15px] font-semibold transition active:scale-95 disabled:opacity-40"
           >
             <Send size={16} />
             {submitting
@@ -255,7 +255,7 @@ export default function LeaderboardModal({ identity, region, run, seed, account,
           </button>
           <button
             onClick={share}
-            className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-white/15 py-3.5 text-[15px] font-semibold transition active:scale-95"
+            className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-fg/15 py-3.5 text-[15px] font-semibold transition active:scale-95"
           >
             {copied ? <Check size={16} className="text-aether-cyan" /> : <Copy size={16} />}
             {copied ? 'Copied!' : 'Share run'}

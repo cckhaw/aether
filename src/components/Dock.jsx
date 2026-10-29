@@ -4,7 +4,7 @@ function DockButton({ icon: Icon, label, onClick, children }) {
   return (
     <button
       onClick={onClick}
-      className="flex min-w-[64px] flex-col items-center gap-1 rounded-2xl px-2 py-1.5 text-white/80 transition active:scale-90 active:bg-white/10"
+      className="flex min-w-[64px] flex-col items-center gap-1 rounded-2xl px-2 py-1.5 text-fg/80 transition active:scale-90 active:bg-fg/10"
     >
       <Icon size={22} strokeWidth={2} />
       <span className="text-[10px] font-medium">{label}</span>
@@ -29,8 +29,8 @@ export default function Dock({ nearest, inRange, sparkCount, walked, onHarvest, 
           className={[
             'relative -mt-9 flex h-[84px] w-[84px] flex-col items-center justify-center rounded-full border text-[11px] font-semibold transition active:scale-90',
             inRange
-              ? 'animate-floaty border-white/40 bg-gradient-to-br from-aether-cyan to-aether-blue text-aether-ink shadow-cyan'
-              : 'border-white/10 bg-white/10 text-white/35',
+              ? 'animate-floaty border-on/40 bg-gradient-to-br from-aether-cyan to-aether-blue text-aether-ink shadow-cyan'
+              : 'border-fg/10 bg-fg/10 text-fg/35',
           ].join(' ')}
         >
           <Zap size={26} fill={inRange ? 'currentColor' : 'none'} strokeWidth={2.2} />
