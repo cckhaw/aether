@@ -1,8 +1,10 @@
 name: Clean up Vercel deployments
 
-# After a production deploy succeeds, delete all other deployments (old production builds and previews).
+# After every push to main, wait for its production deploy to finish, then delete all other
+# deployments (old production builds and previews). Can also be run by hand.
 on:
-  deployment_status:
+  push:
+    branches: [main]
   workflow_dispatch:
     inputs:
       dry_run:
@@ -22,15 +24,18 @@ env:
 
 jobs:
   cleanup:
-    if: >
-      github.event_name == 'workflow_dispatch' ||
-      (github.event.deployment_status.state == 'success' &&
-       github.event.deployment.environment == 'Production')
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
         with:
           sparse-checkout: .github/scripts
+      - name: Wait for this commit's production deploy
+        if: github.event_name == 'push'
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          SHA: ${{ github.sha }}
+        run: .github/scripts/wait-for-vercel.sh
       - name: Delete old deployments
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
